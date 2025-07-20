@@ -1,95 +1,82 @@
 import { useEffect, useState } from "react";
 import CursorTrail from './CursorTrail';
 
-
 function Header() {
     const [fade, setFade] = useState(false);
     const [step, setStep] = useState(0);
-    const [moveText, setMoveText] = useState(false);
-
+    const [shrink, setShrink] = useState(false);
+    const [next, setNext] = useState(0);
 
     const fadeClass = fade
         ? "opacity-100 translate-x-0"
         : "opacity-0 -translate-x-[40px]";
 
-    const baseClass =
-        "absolute transition-all duration-1000 text-6xl font-bold";
+    const baseClass = "transition-all duration-1000 transform";
 
+    const shrinkClass = shrink
+        ? "text-3xl font-bold scale-125"
+        : "scale-90 font-bold";
+
+    // Add y-translation when next === 1
+    const moveUpClass = next === 1 ? "translate-y-[-30px]" : "translate-y-0";
 
     useEffect(() => {
         const timeouts = [
-            // STEP 0
             setTimeout(() => {
+                setFade(false);
+            }, 0),
+            setTimeout(() => {
+                setFade(true);
+            }, 1000),
+
+            setTimeout(() => {
+                setFade(false);
                 setStep(0);
-                setFade(true);
-            }, 700),
-
-            setTimeout(() => {
-                setFade(false);
             }, 2000),
-
-            // STEP 1
+            
             setTimeout(() => {
-                setStep(1);
-            }, 2800),
-
-            setTimeout(() => {
-                setFade(true);
-            }, 3500),
-
-            setTimeout(() => {
-                setFade(false);
-            }, 4800),
-
-            // STEP 2
-            setTimeout(() => {
-                setStep(2);
-            }, 5600),
+                setNext(1);
+            }, 3000),
 
             setTimeout(() => {
                 setFade(true);
-            }, 6300),
-
+                setShrink(true);
+            }, 4000),
             setTimeout(() => {
-                setFade(false);
-            }, 7600),
-
-            // STEP 3 (final)
-            setTimeout(() => {
-                setStep(3);
-            }, 8400),
-
-            setTimeout(() => {
+                setNext(2);
                 setFade(true);
-            }, 9100),
+            }, 5000),
         ];
 
         return () => timeouts.forEach(clearTimeout);
     }, []);
 
+    return (
+        <div className="h-screen flex items-center justify-center relative">
+            <div className="relative flex flex-col items-center">
+                {next === 0 && (
+                    <h1 className={`${baseClass} ${fadeClass} `}>
+                        Hello
+                    </h1>
+                )}
+                {/* "My name is" */}
+                {next >= 1 && (
+                    <h1 className={`${baseClass} ${fadeClass} ${shrinkClass} ${moveUpClass} `}>
+                        My name is
+                    </h1>
+                )}
 
-
-
-    return (<>
-        <div className=" h-screen flex items-center justify-center overflow-hidden">
-            {step === 0 && (
-                <h1 className={`${baseClass} ${fadeClass}`}>Hello! 👋</h1>
-            )}
-            {step === 1 && (
-                <h1 className={`${fadeClass} ${baseClass}`}>My name is Cesar Gonzalez! 🤓</h1>
-            )}
-            {step === 2 && (
-                <h1 className={`${baseClass} ${fadeClass}`}>Greetings! 🤓</h1>
-            )}
-            {step === 3 && (<>
-                <div className={`${baseClass} ${fadeClass} flex flex-col items-center`}>
-                    <h1 className="text-6xl font-bold">Welcome! 🙂‍↕️</h1>
-                    <p className={`${fadeClass} transition-all duration-7000 mt-4 text-lg text-gray-600`}>Let’s begin.</p>
-                </div>
-                </>
-            )}
+                {/* Always reserve space for second h1 to prevent push */}
+                <h1
+                    className={`${baseClass} text-5xl font-bold  ${next === 2 ? "opacity-100" : "opacity-0"
+                        } transition-opacity duration-1000`}
+                >
+                    Cesar Gonzalez
+                </h1>
+            </div>
         </div>
-        </>
     );
 }
+
+
 export default Header;

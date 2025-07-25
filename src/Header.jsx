@@ -1,82 +1,113 @@
 import { useEffect, useState } from "react";
-import CursorTrail from './CursorTrail';
 
-function Header() {
-    const [fade, setFade] = useState(false);
+export default function Header() {
     const [step, setStep] = useState(0);
-    const [shrink, setShrink] = useState(false);
-    const [next, setNext] = useState(0);
-
-    const fadeClass = fade
-        ? "opacity-100 translate-x-0"
-        : "opacity-0 -translate-x-[40px]";
-
-    const baseClass = "transition-all duration-1000 transform";
-
-    const shrinkClass = shrink
-        ? "text-3xl font-bold scale-125"
-        : "scale-90 font-bold";
-
-    // Add y-translation when next === 1
-    const moveUpClass = next === 1 ? "translate-y-[-30px]" : "translate-y-0";
+    const [showContent, setShowContent] = useState(false);
 
     useEffect(() => {
-        const timeouts = [
+        const timers = [
+            setTimeout(() => setStep(1), 700),
+            setTimeout(() => setStep(2), 1400),
+            setTimeout(() => setStep(3), 2100),
+            setTimeout(() => setStep(4), 2800),
+            setTimeout(() => setStep(5), 3500),
             setTimeout(() => {
-                setFade(false);
-            }, 0),
-            setTimeout(() => {
-                setFade(true);
-            }, 1000),
-
-            setTimeout(() => {
-                setFade(false);
-                setStep(0);
-            }, 2000),
-            
-            setTimeout(() => {
-                setNext(1);
-            }, 3000),
-
-            setTimeout(() => {
-                setFade(true);
-                setShrink(true);
-            }, 4000),
-            setTimeout(() => {
-                setNext(2);
-                setFade(true);
-            }, 5000),
+                setStep(6);
+                setShowContent(true);
+            }, 4500),
         ];
 
-        return () => timeouts.forEach(clearTimeout);
+        return () => timers.forEach(clearTimeout);
     }, []);
 
-    return (
-        <div className="h-screen flex items-center justify-center relative">
-            <div className="relative flex flex-col items-center">
-                {next === 0 && (
-                    <h1 className={`${baseClass} ${fadeClass} `}>
-                        Hello
-                    </h1>
-                )}
-                {/* "My name is" */}
-                {next >= 1 && (
-                    <h1 className={`${baseClass} ${fadeClass} ${shrinkClass} ${moveUpClass} `}>
-                        My name is
-                    </h1>
-                )}
+    const isFinal = step >= 5;
 
-                {/* Always reserve space for second h1 to prevent push */}
-                <h1
-                    className={`${baseClass} text-5xl font-bold  ${next === 2 ? "opacity-100" : "opacity-0"
-                        } transition-opacity duration-1000`}
+    // Header size and background
+    const headerSize = step >= 6 ? "h-24" : "h-screen";
+    const headerBg = step >= 6
+        ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
+        : "";
+
+    // Outer wrapper positioning
+    const outerPos = isFinal
+        ? "top-4 -left-20 translate-x-0 translate-y-0"
+        : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2";
+
+    // Inner wrapper layout
+    const innerLayout = isFinal
+        ? "flex-row items-baseline gap-3"
+        : "flex-col items-center";
+
+    return (
+        <>
+            <header
+                className={`
+                    fixed inset-x-0 top-0 z-50
+                    transition-all duration-700 ease-in-out
+                    ${headerSize} ${headerBg}
+                `}
+            >
+                {/* Outer: position + transform */}
+                <div
+                    className={`
+                        absolute transform
+                        transition-all duration-700 ease-out
+                        ${outerPos}
+                    `}
                 >
-                    Cesar Gonzalez
-                </h1>
-            </div>
-        </div>
+                    {/* Inner: layout, sizing, opacity */}
+                    <div
+                        className={`
+                            flex transition-all duration-500 ease-in-out
+                            ${innerLayout}
+                        `}
+                    >
+                        {step < 3 ? (
+                            <h1 className="text-5xl font-thin text-gray-800 dark:text-gray-200">
+                                Hello 👋
+                            </h1>
+                        ) : (
+                            <>
+                                <h1
+                                    className={`
+                                        text-gray-600 dark:text-gray-400
+                                        transition-all duration-500
+                                        ${isFinal ? "text-lg opacity-0" : "text-3xl opacity-100"}
+                                        overflow-hidden
+                                    `}
+                                >
+                                    My name is
+                                </h1>
+                                <h1
+                                    className={`
+                                        text-gray-800 dark:text-gray-200
+                                        transition-all duration-700
+                                        ${step >= 4 ? "opacity-100 text-2xl" : "opacity-0 text-5xl"}
+                                    `}
+                                >
+                                    Cesar Gonzalez
+                                </h1>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </header>
+
+            {showContent && (
+                <main className="pt-24 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+                    <div className="p-8 space-y-4">
+                        <h2 className="text-4xl font-bold">My Projects</h2>
+
+                        <div className="h-screen bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <p>Page Content</p>
+                        </div>
+
+                        <div className="h-screen bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                            <p>And here…</p>
+                        </div>
+                    </div>
+                </main>
+            )}
+        </>
     );
 }
-
-
-export default Header;
